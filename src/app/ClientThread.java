@@ -33,7 +33,7 @@ public class ClientThread extends Thread {
                 while (true) {
                     Message message = new Message("Иван", "Добрый день!", "15:50 25/11/22");
                     try {
-                        outputStream.writeUTF(message);
+                        outputStream.writeObject(message);
                     } catch (IOException e) {
 
                     }
