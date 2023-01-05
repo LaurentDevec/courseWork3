@@ -1,34 +1,51 @@
 package app;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import java.io.IOException;
+import java.util.Scanner;
+
 public class Client {
-    public Socket socket;  // это класс, который содержит сведения о клиенте
-    private ObjectOutputStream output1;
-    private ObjectInputStream input1;
+    private String host;
+    private int port;
+    Socket socket;
+    private Message message;
+    private Scanner scanner;
 
-    public Client(Socket socket, ObjectOutputStream output1, ObjectInputStream input1) {
-        this.socket = socket;
-        this.output1 = output1;
-        this.input1 = input1;
+
+    public Client(String host, int port) {
+        this.host = host;
+        this.port = port;
+
     }
 
-    public Socket getSocket() {
-        return socket;
+    public void start(){
+        System.out.println("Enter Your Name:");
+
+        String name = scanner.nextLine();
+        String text = scanner.nextLine();
+        while (true) {
+            System.out.println("Enter your message");
+
+            sendAndPrintMessage(new Message(name, text));
+            if ("/exit".equals(message)) break;
+        }
     }
 
-    public ObjectOutputStream getOutput1() {
-        return output1;
+    private void  sendAndPrintMessage(Message message){
+        try (Connection connection = new Connection(new Socket(host, port))){
+            connection.sendMessage(message);
+            Message fromServer = connection.readMessage();
+            System.out.println("Ответ сервера:\n" + fromServer.getText());
+        } catch (IOException e) {
+            System.out.println("Send - receive error");
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            System.out.println("Message Error");
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("Unable to connect");
+            e.printStackTrace();
+        }
     }
-
-    public void setOutput1(ObjectOutputStream output1) {
-        this.output1 = output1;
-    }
-
-    public ObjectInputStream getInput1() {
-        return input1;
-    }
-
 }
